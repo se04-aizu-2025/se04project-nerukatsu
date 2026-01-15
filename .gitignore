@@ -1,0 +1,14 @@
+# ===== Java build artifacts =====
+*.class
+
+# Common build directories
+bin/
+out/
+target/
+
+# IDE settings
+.vscode/
+.idea/
+
+# OS files
+.DS_Store
