@@ -1,6 +1,6 @@
 package algorithm;
 
-public class BubbleSort implements SortAlgorithm {
+public class BubbleSort extends AbstractSortAlgorithm {
 
     @Override
     public void sort(int[] array) {
