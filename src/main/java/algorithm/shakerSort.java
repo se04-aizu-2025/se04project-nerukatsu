@@ -1,21 +1,6 @@
-package algorithm;
+public class ShakerSort implements SortAlgorithm{
 
-public class ShakerSort extends AbstractSortAlgorithm {
-
-    @Override
-    public void sort(int[] array) {
-        if (array == null || array.length < 2) {
-            return;
-        }
-        shakerSort(array);
-    }
-
-    @Override
-    public String getName() {
-        return "Shaker Sort";
-    }
-
-    private void shakerSort(int[] a) {
+    public static void shakerSort(int[] a) {
         int left = 0;
         int right = a.length - 1;
         boolean swapped;
@@ -45,6 +30,13 @@ public class ShakerSort extends AbstractSortAlgorithm {
             }
             left++;
             if (!swapped) break;
+        }
+    }
+    public static void main(String[] args) {
+        int[] data = {5, 3, 8, 4, 2};
+        shakerSort(data);
+        for (int i = 0; i < data.length; i++) {
+            System.out.print(data[i] + " ");
         }
     }
 }
