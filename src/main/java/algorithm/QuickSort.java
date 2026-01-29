@@ -26,6 +26,7 @@ public class QuickSort extends AbstractSortAlgorithm {
         int pivot = array[high];
         int i = low - 1;
         for (int j = low; j < high; j++) {
+            notifyVisualizer(j, high);
             if (array[j] <= pivot) {
                 i++;
                 swap(array, i, j);
@@ -36,6 +37,7 @@ public class QuickSort extends AbstractSortAlgorithm {
     }
 
     private void swap(int[] array, int i, int j) {
+        notifyVisualizer(i, j);
         int temp = array[i];
         array[i] = array[j];
         array[j] = temp;

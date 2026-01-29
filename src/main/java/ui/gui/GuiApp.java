@@ -15,6 +15,7 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JSlider;
 import javax.swing.JSpinner;
 import javax.swing.JTextArea;
 import javax.swing.JSplitPane;
@@ -22,6 +23,8 @@ import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 import javax.swing.border.EmptyBorder;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -49,8 +52,10 @@ public class GuiApp {
     private JSpinner sizeSpinner;
     private JSpinner minSpinner;
     private JSpinner maxSpinner;
+    private JSlider speedSlider;
     private JTextArea unsortedArea;
     private JTextArea sortedArea;
+    private SortVisualizer visualizer;
     private JLabel statusLabel;
     private JButton generateButton;
     private JButton sortButton;
@@ -104,7 +109,14 @@ public class GuiApp {
         JPanel main = new JPanel(new BorderLayout(16, 16));
         main.setBackground(new Color(246, 242, 236));
         main.add(buildControlsPanel(), BorderLayout.WEST);
-        main.add(buildDataPanel(), BorderLayout.CENTER);
+        
+        JPanel centerPanel = new JPanel(new BorderLayout(16, 16));
+        centerPanel.setBackground(new Color(246, 242, 236));
+        visualizer = new SortVisualizer();
+        centerPanel.add(visualizer, BorderLayout.NORTH);
+        centerPanel.add(buildDataPanel(), BorderLayout.CENTER);
+        
+        main.add(centerPanel, BorderLayout.CENTER);
         return main;
     }
 
@@ -134,11 +146,26 @@ public class GuiApp {
         generateButton.addActionListener(event -> generateData());
         sortButton.addActionListener(event -> startSort());
 
+        // アニメーション速度スライダーを追加
+        speedSlider = new JSlider(JSlider.HORIZONTAL, 0, 50, 5);
+        speedSlider.setMajorTickSpacing(10);
+        speedSlider.setMinorTickSpacing(1);
+        speedSlider.setPaintTicks(true);
+        speedSlider.setPaintLabels(true);
+        speedSlider.addChangeListener(new ChangeListener() {
+            @Override
+            public void stateChanged(ChangeEvent e) {
+                int speed = speedSlider.getValue();
+                visualizer.setAnimationDelay(51 - speed);
+            }
+        });
+
         int row = 0;
         addControlRow(controls, gbc, row++, "Algorithm", algorithmCombo);
         addControlRow(controls, gbc, row++, "Array size", sizeSpinner);
         addControlRow(controls, gbc, row++, "Minimum", minSpinner);
         addControlRow(controls, gbc, row++, "Maximum", maxSpinner);
+        addControlRow(controls, gbc, row++, "Speed", speedSlider);
 
         gbc.gridy = row++;
         gbc.gridx = 0;
@@ -150,6 +177,16 @@ public class GuiApp {
         controls.add(sortButton, gbc);
 
         return controls;
+    }
+
+    private void addControlRow(JPanel panel, GridBagConstraints gbc, int row, String labelText, JSlider slider) {
+        gbc.gridy = row;
+        gbc.gridx = 0;
+        gbc.gridwidth = 1;
+        panel.add(new JLabel(labelText), gbc);
+
+        gbc.gridx = 1;
+        panel.add(slider, gbc);
     }
 
     private void addControlRow(JPanel panel, GridBagConstraints gbc, int row, String labelText, JSpinner spinner) {
@@ -230,6 +267,7 @@ public class GuiApp {
         currentArray = dataGenerator.generateRandomArray(size, min, max);
         unsortedArea.setText(formatArray(currentArray));
         sortedArea.setText("");
+        visualizer.setData(currentArray, algorithms[algorithmCombo.getSelectedIndex()]);
         statusLabel.setText(String.format("Generated %,d values in [%d, %d].", size, min, max));
     }
 
@@ -239,18 +277,26 @@ public class GuiApp {
                 JOptionPane.INFORMATION_MESSAGE);
             return;
         }
+        
+        // ソート中の場合は新しいソートを開始しない
+        if (visualizer.isSorting()) {
+            JOptionPane.showMessageDialog(frame, "Sorting is already in progress.", "Already Sorting",
+                JOptionPane.INFORMATION_MESSAGE);
+            return;
+        }
 
         SortAlgorithm algorithm = algorithms[algorithmCombo.getSelectedIndex()];
         int[] workingCopy = Arrays.copyOf(currentArray, currentArray.length);
 
         setButtonsEnabled(false);
         statusLabel.setText("Sorting with " + algorithm.getName() + "...");
+        visualizer.setData(workingCopy, algorithm);
 
         SwingWorker<SortResult, Void> worker = new SwingWorker<SortResult, Void>() {
             @Override
             protected SortResult doInBackground() {
                 long start = System.nanoTime();
-                algorithm.sort(workingCopy);
+                visualizer.startSorting();
                 long end = System.nanoTime();
                 boolean sorted = TestEngine.isSorted(workingCopy);
                 return new SortResult(workingCopy, sorted, end - start);
@@ -278,6 +324,11 @@ public class GuiApp {
     private void setButtonsEnabled(boolean enabled) {
         generateButton.setEnabled(enabled);
         sortButton.setEnabled(enabled);
+        algorithmCombo.setEnabled(enabled);
+        sizeSpinner.setEnabled(enabled);
+        minSpinner.setEnabled(enabled);
+        maxSpinner.setEnabled(enabled);
+        speedSlider.setEnabled(enabled);
     }
 
     private String formatStatus(SortAlgorithm algorithm, SortResult result) {
