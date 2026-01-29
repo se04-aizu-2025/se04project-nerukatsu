@@ -12,6 +12,7 @@ public class ShakerSort extends AbstractSortAlgorithm {
             swapped = false;
             // 左 → 右
             for (int i = left; i < right; i++) {
+                notifyVisualizer(i, i + 1);
                 if (array[i] > array[i + 1]) {
                     int temp = array[i];
                     array[i] = array[i + 1];
@@ -24,6 +25,7 @@ public class ShakerSort extends AbstractSortAlgorithm {
             swapped = false;
             // 右 → 左
             for (int i = right; i > left; i--) {
+                notifyVisualizer(i, i - 1);
                 if (array[i] < array[i - 1]) {
                     int temp = array[i];
                     array[i] = array[i - 1];
