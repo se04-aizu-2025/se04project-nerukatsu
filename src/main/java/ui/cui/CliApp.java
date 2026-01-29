@@ -41,7 +41,8 @@ public class CliApp {
             System.out.print("Enter the size of the array to sort: ");
             int size = scanner.nextInt();
 
-            int[] array = dataGenerator.generateRandomArray(size);
+            int[] originalArray = dataGenerator.generateRandomArray(size);
+            int[] array = originalArray.clone();
 
             System.out.println("Before sorting:");
             printArray(array);
@@ -51,8 +52,9 @@ public class CliApp {
             System.out.println("After sorting using " + selectedAlgorithm.getName() + ":");
             printArray(array);
 
-            boolean sorted = TestEngine.isSorted(array);
-            System.out.println("Is sorted: " + sorted);
+            boolean valid = TestEngine.isValidSort(originalArray, array);
+            System.out.println("Is valid sort: " + valid);
+            System.out.println(TestEngine.generateTestReport(originalArray, array));
         }
 
         scanner.close();

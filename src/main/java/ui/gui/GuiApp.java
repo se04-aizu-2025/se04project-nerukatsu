@@ -298,8 +298,8 @@ public class GuiApp {
                 long start = System.nanoTime();
                 visualizer.startSorting();
                 long end = System.nanoTime();
-                boolean sorted = TestEngine.isSorted(workingCopy);
-                return new SortResult(workingCopy, sorted, end - start);
+                boolean valid = TestEngine.isValidSort(currentArray, workingCopy);
+                return new SortResult(workingCopy, valid, end - start);
             }
 
             @Override
@@ -333,7 +333,7 @@ public class GuiApp {
 
     private String formatStatus(SortAlgorithm algorithm, SortResult result) {
         double ms = result.durationNanos / 1_000_000.0;
-        return algorithm.getName() + " completed in " + TIME_FORMAT.format(ms) + " ms. Sorted: " + result.sortedOk;
+        return algorithm.getName() + " completed in " + TIME_FORMAT.format(ms) + " ms. Valid: " + result.sortedOk;
     }
 
     private String formatArray(int[] array) {
