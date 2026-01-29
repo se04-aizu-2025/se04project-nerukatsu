@@ -49,6 +49,7 @@ public class GuiApp {
 
     private JFrame frame;
     private JComboBox<String> algorithmCombo;
+    private JComboBox<String> arrayTypeCombo;
     private JSpinner sizeSpinner;
     private JSpinner minSpinner;
     private JSpinner maxSpinner;
@@ -136,6 +137,12 @@ public class GuiApp {
             algorithmCombo.addItem(algorithm.getName());
         }
 
+        arrayTypeCombo = new JComboBox<>();
+        for (DataGenerator.ArrayType type : DataGenerator.getAvailableTypes()) {
+            arrayTypeCombo.addItem(type.getDisplayName());
+        }
+        arrayTypeCombo.setSelectedIndex(0); // RANDOM がデフォルト
+
         sizeSpinner = new JSpinner(new SpinnerNumberModel(40, 0, 100000, 1));
         minSpinner = new JSpinner(new SpinnerNumberModel(0, -100000, 100000, 1));
         maxSpinner = new JSpinner(new SpinnerNumberModel(100, -100000, 100000, 1));
@@ -162,6 +169,7 @@ public class GuiApp {
 
         int row = 0;
         addControlRow(controls, gbc, row++, "Algorithm", algorithmCombo);
+        addControlRow(controls, gbc, row++, "Array Type", arrayTypeCombo);
         addControlRow(controls, gbc, row++, "Array size", sizeSpinner);
         addControlRow(controls, gbc, row++, "Minimum", minSpinner);
         addControlRow(controls, gbc, row++, "Maximum", maxSpinner);
@@ -264,11 +272,13 @@ public class GuiApp {
             return;
         }
 
-        currentArray = dataGenerator.generateRandomArray(size, min, max);
+        DataGenerator.ArrayType arrayType = DataGenerator.getAvailableTypes()[arrayTypeCombo.getSelectedIndex()];
+        currentArray = dataGenerator.generateArray(arrayType, size, min, max);
         unsortedArea.setText(formatArray(currentArray));
         sortedArea.setText("");
         visualizer.setData(currentArray, algorithms[algorithmCombo.getSelectedIndex()]);
-        statusLabel.setText(String.format("Generated %,d values in [%d, %d].", size, min, max));
+        statusLabel.setText(String.format("Generated %s array with %,d values in [%d, %d].", 
+            arrayType.getDisplayName(), size, min, max));
     }
 
     private void startSort() {
@@ -325,6 +335,7 @@ public class GuiApp {
         generateButton.setEnabled(enabled);
         sortButton.setEnabled(enabled);
         algorithmCombo.setEnabled(enabled);
+        arrayTypeCombo.setEnabled(enabled);
         sizeSpinner.setEnabled(enabled);
         minSpinner.setEnabled(enabled);
         maxSpinner.setEnabled(enabled);

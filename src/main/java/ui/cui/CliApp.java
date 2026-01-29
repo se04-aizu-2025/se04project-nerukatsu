@@ -38,13 +38,26 @@ public class CliApp {
 
             SortAlgorithm selectedAlgorithm = algorithms[choice - 1];
 
+            System.out.println("\nSelect array type:");
+            DataGenerator.ArrayType[] arrayTypes = DataGenerator.getAvailableTypes();
+            for (int i = 0; i < arrayTypes.length; i++) {
+                System.out.println((i + 1) + ". " + arrayTypes[i].getDisplayName());
+            }
+            System.out.print("Enter your choice: ");
+            int typeChoice = scanner.nextInt();
+            if (typeChoice < 1 || typeChoice > arrayTypes.length) {
+                System.out.println("Invalid choice. Using Random.");
+                typeChoice = 1;
+            }
+            DataGenerator.ArrayType arrayType = arrayTypes[typeChoice - 1];
+
             System.out.print("Enter the size of the array to sort: ");
             int size = scanner.nextInt();
 
-            int[] originalArray = dataGenerator.generateRandomArray(size);
+            int[] originalArray = dataGenerator.generateArray(arrayType, size);
             int[] array = originalArray.clone();
 
-            System.out.println("Before sorting:");
+            System.out.println("\nBefore sorting (" + arrayType.getDisplayName() + "):");
             printArray(array);
 
             selectedAlgorithm.sort(array);
