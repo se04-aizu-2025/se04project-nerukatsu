@@ -1,0 +1,10 @@
+src/main/java/ui/cui/CliApp.java
+src/main/java/ui/gui/SortVisualizer.java
+src/main/java/ui/gui/GuiApp.java
+src/main/java/algorithm/QuickSort.java
+src/main/java/algorithm/AbstractSortAlgorithm.java
+src/main/java/algorithm/SortAlgorithm.java
+src/main/java/algorithm/ShakerSort.java
+src/main/java/algorithm/BubbleSort.java
+src/main/java/data/DataGenerator.java
+src/main/java/test/TestEngine.java
